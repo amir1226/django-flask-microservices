@@ -1,0 +1,7 @@
+/.idea
+/__pycache__
+.env
+/django_environment
+/postgres
+/django_admin/__pycache__
+/products/__pycache__
