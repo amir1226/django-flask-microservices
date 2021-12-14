@@ -36,8 +36,7 @@ class ProductUser(db.Model):
     user_id = db.Column(db.Integer)
     product_id = db.Column(db.Integer)
 
-    UniqueConstraint('user_id', 'product_id', name= 'user_product_unique')
-    # TODO: Fix constrain because it is not applied on db
+    __table_args__ = (UniqueConstraint(user_id, product_id, name='user_product_unique'),)
 
 @app.route('/api/products')
 def index():
@@ -49,13 +48,14 @@ def like(id):
     req = requests.get('http://host.docker.internal:9000/user')
     if req.status_code == 200:
         json = req.json()
+        userid = json['id']
         try:
-            productUser = ProductUser(user_id=json['id'], product_id=id)
+            productUser = ProductUser(user_id=userid, product_id=id)
             db.session.add(productUser)
             db.session.commit()
             publish('product_liked', id)
         except:
-            abort(400, 'You already liked this product')
+            abort(400, f'Id {userid} already liked this product')
 
         return jsonify({'message': 'success'})
     
